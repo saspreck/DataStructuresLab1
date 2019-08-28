@@ -16,7 +16,7 @@ bool checkDateStamp(std::string dataLine, std::string dateStamp, int lineNum) {
 	//checks if the substring doesn't match the correct one
 	if (dateCheck != dateStamp) {
 		//prints out the error message
-		std::cout << "Non-matching date stamp " << dateCheck << " at line " << lineNum << ".\n";
+		std::cout << "Non-matching date stamp " << dateCheck << " at line " << lineNum << "." << std::endl;
 		return false;
 	}
 	else {
@@ -29,19 +29,24 @@ bool checkDateStamp(std::string dataLine, std::string dateStamp, int lineNum) {
 Method to check if the time stamp is unique
 */
 bool checkTimeStamp(std::string dataLine, std::set<std::string>& timeStamps, int lineNum) {
+
 	//gets the initial size of the set
 	int timeStampStartSize = timeStamps.size();
+
 	//makes a substring of everything except the date
 	std::string dataLineMinusDate = dataLine.substr(dataLine.find(',') + 1);
+
 	//makes a substring of the time stamp
 	std::string timeStampToCheck = dataLineMinusDate.substr(0, dataLineMinusDate.find(','));
+
 	//attempts to insert the time stamp into the set
 	timeStamps.insert(timeStampToCheck);
 
 	//if the size of the set did not increase then the time stamp was not unique
 	if (timeStampStartSize == timeStamps.size()) {
+
 		//prints out error message
-		std::cout << "Duplicate time stamp " << timeStampToCheck << " at line " << lineNum << "\n";
+		std::cout << "Duplicate time stamp " << timeStampToCheck << " at line " << lineNum << std::endl;
 		return false;
 	}
 	else {
@@ -50,14 +55,43 @@ bool checkTimeStamp(std::string dataLine, std::set<std::string>& timeStamps, int
 
 }
 
+/*
+Method to check that all the float values are positive*/
+bool checkFloatValues(std::string dataLine, int lineNum) {
+	//declare variables
+	std::string tempData;
+	float floatData;
+
+	//turn input string into a stringstream
+	std::stringstream stringData(dataLine);
+	
+	//ignores the date and time stamps
+	stringData.ignore(256, ',');
+	stringData.ignore(256, ',');
+
+	//iterates through each data point checking
+	for (int i = 0; i < 16; i++) {
+		//splits each piece of data off from the stringstream and turns it into a float
+		std::getline(stringData, tempData, ',');
+		floatData = std::stof(tempData);
+
+		//checks if the data is positive and throws an error otherwise
+		if (floatData <= 0) {
+			std::cout << "Invalid floating-point data at line " << lineNum << std::endl;
+			return false;
+		}
+	}
+	//returns true if all the data values are positive
+	return true;
+}
+
 int main()
 {
 	//declare variables
     int dataLineNum = 1;
 	std::string initialDateStamp = "";
 
-	//declare array to contain data from each line and vector to hold all time stamps
-	std::string drillingData[18];
+	//declare set to hold all time stamps
 	std::set<std::string> timeStamps;
 
 	//declares variable to store file line in and then skips the first line
@@ -72,22 +106,20 @@ int main()
 		}
 
 		if (checkDateStamp(line, initialDateStamp, dataLineNum)) {
-			std::cout << "Date stamp worked\n";
+			std::cout << "Date stamp worked" << std::endl;
 			
 			if (checkTimeStamp(line, timeStamps, dataLineNum)) {
-				std::cout << "Time stamp worked\n";
+				std::cout << "Time stamp worked" << std::endl;
+
+				if (checkFloatValues(line, dataLineNum)) {
+					std::cout << "Float values correct" << std::endl;
+				}
 			}
 		}
 
 		dataLineNum++;
 	}
 	
-	
-	
-	//check if date stamp does not match
-	
-
-	//check if time stamp is unique
 	return 0;
 
 }
