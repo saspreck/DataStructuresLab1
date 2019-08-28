@@ -6,6 +6,7 @@
 #include <string>
 #include <set>
 #include <array>
+#include <algorithm>
 
 /*
 Method to check if the date stamp matches the correct one
@@ -31,7 +32,7 @@ Method to check if the time stamp is unique
 bool checkTimeStamp(std::string dataLine, std::set<std::string>& timeStamps, int lineNum) {
 
 	//gets the initial size of the set
-	int timeStampStartSize = timeStamps.size();
+	int timeStampStartSize = (int) timeStamps.size();
 
 	//makes a substring of everything except the date
 	std::string dataLineMinusDate = dataLine.substr(dataLine.find(',') + 1);
@@ -43,10 +44,10 @@ bool checkTimeStamp(std::string dataLine, std::set<std::string>& timeStamps, int
 	timeStamps.insert(timeStampToCheck);
 
 	//if the size of the set did not increase then the time stamp was not unique
-	if (timeStampStartSize == timeStamps.size()) {
+	if (timeStampStartSize == (int) timeStamps.size()) {
 
 		//prints out error message
-		std::cout << "Duplicate time stamp " << timeStampToCheck << " at line " << lineNum << std::endl;
+		std::cout << "Duplicate time stamp " << timeStampToCheck << " at line " << lineNum <<  "." << std::endl;
 		return false;
 	}
 	else {
@@ -77,7 +78,7 @@ bool checkFloatValues(std::string dataLine, int lineNum) {
 
 		//checks if the data is positive and throws an error otherwise
 		if (floatData <= 0) {
-			std::cout << "Invalid floating-point data at line " << lineNum << std::endl;
+			std::cout << "Invalid floating-point data at line " << lineNum << "." << std::endl;
 			return false;
 		}
 	}
@@ -105,18 +106,22 @@ int main()
 			initialDateStamp = line.substr(0, line.find(','));
 		}
 
+		//calls the checkDateStamp function to ensure date stamps are correct
 		if (checkDateStamp(line, initialDateStamp, dataLineNum)) {
-			std::cout << "Date stamp worked" << std::endl;
 			
+			//calls the checkTimeStamp function to ensure time stamps are unique
 			if (checkTimeStamp(line, timeStamps, dataLineNum)) {
-				std::cout << "Time stamp worked" << std::endl;
-
+				
+				//calls the checkFloatValues method to ensure they are positive
 				if (checkFloatValues(line, dataLineNum)) {
-					std::cout << "Float values correct" << std::endl;
+					
+					//replaces all of the commas with semicolons and then prints out the resulting string
+					std::replace(line.begin(), line.end(), ',', ';');
+					std::cout << line << std::endl;
 				}
 			}
 		}
-
+		//increases the line number
 		dataLineNum++;
 	}
 	
